@@ -4,16 +4,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "hardhat/console.sol";
-
-contract Degen_Token is ERC20, Ownable {
+contract Degen_Token is ERC20, Ownable{
     mapping(address => mapping(address => uint256)) private _allowances;
     constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {}
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
-    // Redeeming tokens for items in the in-game store (placeholder function)
-    function redeemTokens() external pure {
-    // Adding the custom logic for redeeming items if needed
+    function redeem_Tokens() external pure {
     revert("Redeeming tokens for items is not implemented");
     }
     function get_Balance(address account) external view returns (uint256) {
@@ -44,11 +41,11 @@ contract Degen_Token is ERC20, Ownable {
         _approve(msg.sender, spender, currentAllowance - subtracted_Value);
         return true;
     }
-    function increase_Allow(address spender, uint256 addedValue) public virtual returns (bool) {
-        _approve(msg.sender, spender, allowance(msg.sender, spender) + addedValue);
+    function increase_Allow(address spender, uint256 added_Value) public virtual returns (bool) {
+        _approve(msg.sender, spender, allowance(msg.sender, spender) + added_Value);
         return true;
     }
-    function renounce_Own() public virtual  onlyOwner {
+    function renounce_Owners() public virtual  onlyOwner {
         renounceOwnership();
     }
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
@@ -56,7 +53,7 @@ contract Degen_Token is ERC20, Ownable {
         _approve(sender, msg.sender, allowance(sender, msg.sender) - amount);
         return true;
     }
-    function transfer_Owner(address new_Owner) public virtual onlyOwner {
+    function transfer_Owners(address new_Owner) public virtual onlyOwner {
         transferOwnership(new_Owner);
     }
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
