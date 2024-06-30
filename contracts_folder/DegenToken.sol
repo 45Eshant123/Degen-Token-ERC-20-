@@ -1,65 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
+
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "hardhat/console.sol";
-contract Degen_Token is ERC20, Ownable{
-    mapping(address => mapping(address => uint256)) private _allowances;
-    constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {}
+
+contract Degen_Token is ERC20, Ownable {
+    mapping(string => uint256) public itemPrices;
+    event ItemRedeemed(address indexed user, string itemName, uint256 amount);
+
+    constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {
+        // Initialize item prices inside the constructor
+        itemPrices["sword"] = 100 * 10**decimals(); 
+        itemPrices["shield"] = 150 * 10**decimals(); 
+    }
+
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
-    function redeem_Tokens() external pure {
-    revert("Redeeming tokens for items is not implemented");
+
+    function redeemTokens(string memory itemName) external {
+        uint256 itemPrice = itemPrices[itemName];
+        require(itemPrice > 0, "Item not available");
+        require(balanceOf(msg.sender) >= itemPrice, "Insufficient balance to redeem item");
+        _burn(msg.sender, itemPrice);
+        emit ItemRedeemed(msg.sender, itemName, itemPrice);
     }
-    function get_Balance(address account) external view returns (uint256) {
+
+    function getBalance(address account) external view returns (uint256) {
         return balanceOf(account);
     }
-    function burn_Tokens(uint256 amount) external {
+
+    function burnTokens(uint256 amount) external {
         _burn(msg.sender, amount);
     }
-    function transfer_Tokens(address recipient, uint256 amount) external {
+
+    function transferTokens(address recipient, uint256 amount) external {
         require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+        approve(msg.sender,amount);
         _transfer(msg.sender, recipient, amount);
     }
-    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+
+    function approve(address spender, uint256 amount) public override returns (bool) {
         _approve(msg.sender, spender, amount);
         return true;
     }
-    function burn(uint256 amount) public virtual {
+
+    function burn(uint256 amount) public {
         _burn(msg.sender, amount);
     }
-    function burn_From(address account, uint256 amount) public virtual {
-        uint256 decreased_Allowance = allowance(account, msg.sender) - amount;
-        _approve(account, msg.sender, decreased_Allowance);
+
+    function burnFrom(address account, uint256 amount) public {
+        uint256 decreasedAllowance = allowance(account, msg.sender) - amount;
+        _approve(account, msg.sender, decreasedAllowance);
         _burn(account, amount);
     }
-    function decrease_Allow(address spender, uint256 subtracted_Value) public virtual returns (bool) {
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
         uint256 currentAllowance = allowance(msg.sender, spender);
-        require(currentAllowance >= subtracted_Value, "ERC20: decreased allowance below zero");
-        _approve(msg.sender, spender, currentAllowance - subtracted_Value);
+        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+        _approve(msg.sender, spender, currentAllowance - subtractedValue);
         return true;
     }
-    function increase_Allow(address spender, uint256 added_Value) public virtual returns (bool) {
-        _approve(msg.sender, spender, allowance(msg.sender, spender) + added_Value);
+
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+        _approve(msg.sender, spender, allowance(msg.sender, spender) + addedValue);
         return true;
     }
-    function renounce_Owners() public virtual  onlyOwner {
-        renounceOwnership();
+
+    function renounceOwnership() public override onlyOwner {
+        Ownable.renounceOwnership();
     }
-    function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
-        _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, allowance(sender, msg.sender) - amount);
-        return true;
+
+    function transferOwnership(address newOwner) public override onlyOwner {
+        Ownable.transferOwnership(newOwner);
     }
-    function transfer_Owners(address new_Owner) public virtual onlyOwner {
-        transferOwnership(new_Owner);
-    }
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
-        return _allowances[owner][spender];
-    }
-    function show_Storelter() external pure {
-        revert("show-Storelter is not implemented");
+
+    function showStore() external pure {
+        revert("showStore is not implemented");
     }
 }
