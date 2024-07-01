@@ -11,7 +11,7 @@ contract Degen_Token is ERC20, Ownable {
     event ItemRedeemed(address indexed user, string itemName, uint256 amount);
 
     constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {
-        // Initialize item prices inside the constructor
+        // Here i have initialize the item prices inside a constructor
         itemPrices["sword"] = 100 * 10**decimals(); 
         itemPrices["shield"] = 150 * 10**decimals(); 
     }
